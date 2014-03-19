@@ -4,6 +4,8 @@ node[:deploy].each do |application, deploy|
   deploy = node[:deploy][application]
 
   execute "restart Rails app #{application}" do
+    command "rm -f #{deploy[:deploy_to]}/current/.env; ln -s #{deploy[:deploy_to]}/.env #{deploy[:deploy_to]}/shared/.env"
+
     cwd deploy[:current_path]
     command node[:opsworks][:rails_stack][:restart_command]
     action :nothing
@@ -15,10 +17,6 @@ node[:deploy].each do |application, deploy|
     mode "00755"
     group deploy[:group]
     owner deploy[:user]
-
-    execute "create sym_link .env" do
-      command "rm -f #{deploy[:deploy_to]}/current/.env; ln -s #{deploy[:deploy_to]}/.env #{deploy[:deploy_to]}/shared/.env"
-    end
 
     notifies :run, "execute[restart Rails app #{application}]"
   end

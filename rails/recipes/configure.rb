@@ -44,14 +44,4 @@ node[:deploy].each do |application, deploy|
       deploy[:memcached][:host].present? && File.directory?("#{deploy[:deploy_to]}/shared/config/")
     end
   end
-
-  template "#{deploy[:deploy_to]}/shared/.env" do
-    source "dotenv.erb"
-    cookbook 'rails'
-    mode "00755"
-    group deploy[:group]
-    owner deploy[:user]
-
-    notifies :run, "execute[restart Rails app #{application}]"
-  end
 end

@@ -16,7 +16,9 @@ node[:deploy].each do |application, deploy|
     group deploy[:group]
     owner deploy[:user]
 
-    command "rm -f #{deploy[:deploy_to]}/current/.env; ln -s #{deploy[:deploy_to]}/.env #{deploy[:deploy_to]}/shared/.env"
+    execute "create sym_link .env" do
+      command "rm -f #{deploy[:deploy_to]}/current/.env; ln -s #{deploy[:deploy_to]}/.env #{deploy[:deploy_to]}/shared/.env"
+    end
 
     notifies :run, "execute[restart Rails app #{application}]"
   end

@@ -16,6 +16,8 @@ node[:deploy].each do |application, deploy|
     group deploy[:group]
     owner deploy[:user]
 
+    command "rm -f #{deploy[:deploy_to]}/current/.env; ln -s #{deploy[:deploy_to]}/.env #{deploy[:deploy_to]}/shared/.env"
+
     notifies :run, "execute[restart Rails app #{application}]"
   end
 end

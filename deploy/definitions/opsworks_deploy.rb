@@ -64,9 +64,7 @@ define :opsworks_deploy do
     Chef::Log.debug("Checking out source code of application #{application} with type #{deploy[:application_type]}")
     deploy deploy[:deploy_to] do
       provider Chef::Provider::Deploy.const_get(deploy[:chef_provider])
-      if deploy[:keep_releases]
-        keep_releases deploy[:keep_releases]
-      end
+      keep_releases deploy[:keep_releases]
       repository deploy[:scm][:repository]
       user deploy[:user]
       group deploy[:group]
@@ -74,6 +72,7 @@ define :opsworks_deploy do
       migrate deploy[:migrate]
       migration_command deploy[:migrate_command]
       environment deploy[:environment].to_hash
+      create_dirs_before_symlink( deploy[:create_dirs_before_symlink] )
       symlink_before_migrate( deploy[:symlink_before_migrate] )
       action deploy[:action]
 
@@ -145,7 +144,7 @@ define :opsworks_deploy do
           end
         elsif deploy[:application_type] == 'nodejs'
           if deploy[:auto_npm_install_on_deploy]
-            OpsWorks::NodejsConfiguration.npm_install(application, node[:deploy][application], release_path)
+            OpsWorks::NodejsConfiguration.npm_install(application, node[:deploy][application], release_path, node[:opsworks_nodejs][:npm_install_options])
           end
         end
 

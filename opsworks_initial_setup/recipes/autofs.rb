@@ -1,7 +1,10 @@
 package "autofs"
 
 service "autofs" do
-  supports :status => true, :restart => true, :reload => true
+  if node['platform'] == 'ubuntu'
+    provider Chef::Provider::Service::Upstart
+  end
+  supports :status => true, :restart => false, :reload => true
   action [ :enable, :start ]
 end
 
